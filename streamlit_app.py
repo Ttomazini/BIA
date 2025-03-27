@@ -1,56 +1,65 @@
 import streamlit as st
-from openai import OpenAI
+import openai
 
-# Show title and description.
-st.title("💬 Chatbot")
-st.write(
-    "This is a simple chatbot that uses OpenAI's GPT-3.5 model to generate responses. "
-    "To use this app, you need to provide an OpenAI API key, which you can get [here](https://platform.openai.com/account/api-keys). "
-    "You can also learn how to build this app step by step by [following our tutorial](https://docs.streamlit.io/develop/tutorials/llms/build-conversational-apps)."
-)
+# Configuração inicial da página
+st.set_page_config(page_title="✨ Bia ✨")
+st.title("✨ Bia ✨")
+st.write("Ei, eu sou a BIA (Bold Inteligência Artificial), sua assistente da Bold! Tô aqui pra deixar seu dia mais fácil: atividades mais rápidas, eficientes e tirar dúvidas!")
 
-# Ask user for their OpenAI API key via `st.text_input`.
-# Alternatively, you can store the API key in `./.streamlit/secrets.toml` and access it
-# via `st.secrets`, see https://docs.streamlit.io/develop/concepts/connections/secrets-management
-openai_api_key = st.text_input("OpenAI API Key", type="password")
-if not openai_api_key:
-    st.info("Please add your OpenAI API key to continue.", icon="🗝️")
-else:
+# Configuração da API Key via arquivo secreto
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-    # Create an OpenAI client.
-    client = OpenAI(api_key=openai_api_key)
+# ID do assistente criado na plataforma OpenAI
+assistant_id = "asst_HgFhlVBy2xLofnuBdDBMVzli"
 
-    # Create a session state variable to store the chat messages. This ensures that the
-    # messages persist across reruns.
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+# Inicializar a conversa (thread)
+if "thread_id" not in st.session_state:
+    thread = openai.beta.threads.create()
+    st.session_state.thread_id = thread.id
 
-    # Display the existing chat messages via `st.chat_message`.
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+# Exibir histórico de mensagens
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-    # Create a chat input field to allow the user to enter a message. This will display
-    # automatically at the bottom of the page.
-    if prompt := st.chat_input("What is up?"):
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-        # Store and display the current prompt.
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+# Input para pergunta
+if prompt := st.chat_input("Digite sua pergunta aqui"):
 
-        # Generate a response using the OpenAI API.
-        stream = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-            stream=True,
-        )
+    # Exibir pergunta do usuário
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-        # Stream the response to the chat using `st.write_stream`, then store it in 
-        # session state.
-        with st.chat_message("assistant"):
-            response = st.write_stream(stream)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+    # Enviar pergunta para o Assistente
+    openai.beta.threads.messages.create(
+        thread_id=st.session_state.thread_id,
+        role="user",
+        content=prompt
+    )
+
+    run = openai.beta.threads.runs.create(
+        thread_id=st.session_state.thread_id,
+        assistant_id=assistant_id
+    )
+
+    # Aguarda a resposta
+    with st.spinner("BIA está respondendo..."):
+        while True:
+            run_status = openai.beta.threads.runs.retrieve(
+                thread_id=st.session_state.thread_id,
+                run_id=run.id
+            )
+            if run_status.status == "completed":
+                break
+
+    # Recuperar resposta
+    messages = openai.beta.threads.messages.list(thread_id=st.session_state.thread_id)
+    resposta = messages.data[0].content[0].text.value
+
+    # Exibir resposta
+    st.session_state.messages.append({"role": "assistant", "content": resposta})
+    with st.chat_message("assistant"):
+        st.markdown(resposta)
