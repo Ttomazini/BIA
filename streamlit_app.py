@@ -1,5 +1,10 @@
 import streamlit as st
 import openai
+from PIL import Image
+
+# Exibir imagem da BIA
+bia_image = Image.open("BIA.png")  # nome com letras maiúsculas, igual ao arquivo no repositório
+st.image(bia_image, width=150)
 
 # Configuração inicial da página
 st.set_page_config(page_title="✨ Bia ✨")
