@@ -6,8 +6,15 @@ from PIL import Image
 st.set_page_config(page_title="✨ Bia ✨")
 
 # Agora pode exibir a imagem
-bia_image = Image.open("BIA.png")
-st.image(bia_image, width=150)
+st.markdown(
+    """
+    <div style='text-align: center;'>
+        <img src='https://raw.githubusercontent.com/Ttomazini/BIA/principal/BIA.png' width='120' style='border-radius: 50%; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); margin-bottom: 10px;' />
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 
 st.title("✨ Bia ✨")
 st.write("Ei, eu sou a BIA (Bold Inteligência Artificial), sua assistente da Bold! Tô aqui para DESCOMPLICAR seu dia: Atividades mais rápidas, Conversas eficientes e tirar dúvidas!")
