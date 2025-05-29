@@ -2,14 +2,16 @@ import streamlit as st
 import openai
 from PIL import Image
 
-# Exibir imagem da BIA
-bia_image = Image.open("BIA.png")  # nome com letras maiúsculas, igual ao arquivo no repositório
+# ✅ Isso tem que vir antes de qualquer comando Streamlit
+st.set_page_config(page_title="✨ Bia ✨")
+
+# Agora pode exibir a imagem
+bia_image = Image.open("BIA.png")
 st.image(bia_image, width=150)
 
-# Configuração inicial da página
-st.set_page_config(page_title="✨ Bia ✨")
 st.title("✨ Bia ✨")
 st.write("Ei, eu sou a BIA (Bold Inteligência Artificial), sua assistente da Bold! Tô aqui para DESCOMPLICAR seu dia: Atividades mais rápidas, Conversas eficientes e tirar dúvidas!")
+
 
 # Configuração da API Key via arquivo secreto
 openai.api_key = st.secrets["OPENAI_API_KEY"]
