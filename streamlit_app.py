@@ -15,12 +15,12 @@ def get_image_base64(img_path):
     img_base64 = base64.b64encode(buffered.getvalue()).decode()
     return img_base64
 
-# ✅ Carrega imagem e renderiza HTML com estilo circular centralizado
-img_base64 = get_image_base64("BIA.png")
+# ✅ Carrega nova imagem da logo (avião)
+img_base64 = get_image_base64("aviao.png")
 st.markdown(
     f"""
     <div style='text-align: center;'>
-        <img src='data:image/png;base64,{img_base64}' width='120' style='border-radius: 50%; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); margin-bottom: 10px;' />
+        <img src='data:image/png;base64,{img_base64}' width='120' style='border-radius: 20%; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); margin-bottom: 10px;' />
         <h2>✨ Bia ✨</h2>
         <p style='font-size: 16px;'>Ei, eu sou a BIA (Bold Inteligência Artificial), sua assistente da Bold!<br>
         Tô aqui para DESCOMPLICAR seu dia: Atividades mais rápidas, Conversas eficientes e tirar dúvidas!</p>
@@ -28,7 +28,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-
 
 # Configuração da API Key via arquivo secreto
 openai.api_key = st.secrets["OPENAI_API_KEY"]
