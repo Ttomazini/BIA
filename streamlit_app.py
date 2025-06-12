@@ -1,5 +1,6 @@
 import streamlit as st
 import openai
+import os  # 👈 novo import necessário
 from PIL import Image
 import base64
 from io import BytesIO
@@ -29,8 +30,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Configuração da API Key via arquivo secreto
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# ✅ Configuração da API Key via variável de ambiente (Render)
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 # ID do assistente criado na plataforma OpenAI
 assistant_id = "asst_HgFhlVBy2xLofnuBdDBMVzli"
